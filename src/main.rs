@@ -2,10 +2,10 @@ mod ui;
 mod app;
 mod color;
 
-use std::{error::Error, io};
+use std::{collections::hash_map::Keys, error::Error, io};
 
 use app::App;
-use crossterm::{event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}};
+use crossterm::{event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyModifiers}, execute, terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}};
 use ratatui::{backend::{Backend, CrosstermBackend}, Terminal};
 use ui::ui;
 
@@ -38,32 +38,32 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 continue;
             }
 
-            match key.code {
-                KeyCode::Char('q') => {
+            match key{
+                KeyEvent{code: KeyCode::Char('q'),..}=> {
                     return Ok(true);
                 }
-                KeyCode::Up | KeyCode::Char('k') => {
-                    app.dec_offset()
-                }
-                KeyCode::Down | KeyCode::Char('j') => {
-                    app.inc_offset()
-                }
-                KeyCode::Char('J') => {
+                KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                     app.shift_down()
                 }
-                KeyCode::Char('K') => {
+                KeyEvent{code: KeyCode::Up,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('K'),..}=> {
                     app.shift_up()
                 }
-                KeyCode::Char('a') => {
+                KeyEvent{code: KeyCode::Up,..} | KeyEvent{code: KeyCode::Char('k'),..}=> {
+                    app.dec_offset()
+                }
+                KeyEvent{code: KeyCode::Down,..} | KeyEvent{code: KeyCode::Char('j'),..}=> {
+                    app.inc_offset()
+                }
+                KeyEvent{code: KeyCode::Char('a'),..}=> {
                     app.insert_color()
                 }
-                KeyCode::Char('d') => {
+                KeyEvent{code: KeyCode::Char('d'),..} => {
                     app.remove_color()
                 }
-                KeyCode::Char('s') => {
+                KeyEvent{code: KeyCode::Char('s'),..} => {
                     app.toggle_lock()
                 }
-                KeyCode::Char(' ') => {
+                KeyEvent{code: KeyCode::Char(' '),..} => {
                     app.regen_unlocked()
                 }
                 _ => {}
