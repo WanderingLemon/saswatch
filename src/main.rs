@@ -2,7 +2,7 @@ mod ui;
 mod app;
 mod color;
 
-use std::{collections::hash_map::Keys, error::Error, io};
+use std::{error::Error, io};
 
 use app::App;
 use crossterm::{event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyModifiers}, execute, terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}};
