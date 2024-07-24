@@ -56,6 +56,36 @@ impl App {
         self.colors.to_owned()
     }
 
+    pub fn shift_up(&mut self) {
+        if self.entries <= 1{
+            return
+        }
+
+        let offset = self.offset;
+        if offset == 0 {
+            self.colors.swap(self.offset, self.entries-1);
+            self.offset = self.entries - 1;
+        } else {
+            self.colors.swap(self.offset, self.offset-1);
+            self.offset -= 1;
+        }
+    }
+
+    pub fn shift_down(&mut self) {
+        if self.entries <= 1{
+            return
+        }
+        
+        let offset = self.offset;
+        if offset < self.entries-1 {
+            self.colors.swap(self.offset, self.offset+1);
+            self.offset += 1;
+        } else {
+            self.colors.swap(self.offset, 0);
+            self.offset = 0;
+        }
+    }
+
     pub fn toggle_lock(&mut self) {
         let color = self.colors.get_mut(self.offset).unwrap();
         if !color.locked {

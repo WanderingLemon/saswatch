@@ -6,8 +6,6 @@ use std::{error::Error, io};
 
 use app::App;
 use crossterm::{event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode}, execute, terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}};
-use palette::Srgb;
-use rand::random;
 use ratatui::{backend::{Backend, CrosstermBackend}, Terminal};
 use ui::ui;
 
@@ -49,6 +47,12 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 }
                 KeyCode::Down | KeyCode::Char('j') => {
                     app.inc_offset()
+                }
+                KeyCode::Char('J') => {
+                    app.shift_down()
+                }
+                KeyCode::Char('K') => {
+                    app.shift_up()
                 }
                 KeyCode::Char('a') => {
                     app.insert_color()
