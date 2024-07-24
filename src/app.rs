@@ -45,10 +45,13 @@ impl App {
 
     pub fn remove_color(&mut self) {
         let offset = self.offset;
-        if self.entries > 1{
+        let entries = self.entries;
+        if entries > 1{
             self.colors.remove(offset);
+            if offset == entries-1{
+                self.dec_offset();
+            }
             self.entries -= 1;
-            self.dec_offset();
         }
     }
 
