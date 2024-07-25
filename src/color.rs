@@ -15,6 +15,10 @@ impl Color {
             locked: false
         }
     }
+
+    pub fn hex_string(&self) -> String {
+        format!("#{:x}",self.rgb)
+    }
 }
 
 impl Into<Row<'_>> for Color {

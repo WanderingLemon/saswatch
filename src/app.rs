@@ -1,8 +1,11 @@
 use std::usize;
 
+use clipboard::{ClipboardContext, ClipboardProvider};
+
 use crate::color::Color;
 
 pub struct App{
+    clipboard_ctx: ClipboardContext,
     help_screen: bool,
     entries: usize,
     offset: usize,
@@ -13,6 +16,7 @@ impl App {
     pub fn new() -> App {
         let colors = Vec::from([Color::random_new()]);
         App {
+            clipboard_ctx: ClipboardProvider::new().unwrap(),
             help_screen: false,
             entries: 1,
             offset: 0,
@@ -119,5 +123,11 @@ impl App {
         } else {
             self.help_screen = false
         }
+    }
+
+    pub fn copy_hex(&mut self) {
+        let color = self.colors.get(self.offset).unwrap();
+        let hex = color.hex_string();
+        let _ = self.clipboard_ctx.set_contents(hex);
     }
 } 

@@ -1,6 +1,7 @@
 mod ui;
 mod app;
 mod color;
+mod files;
 
 use std::{error::Error, io};
 
@@ -66,6 +67,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 }
                 KeyEvent{code: KeyCode::Char('s'),..} => {
                     app.toggle_lock()
+                }
+                KeyEvent{code: KeyCode::Char('c'),..} => {
+                    app.copy_hex()
                 }
                 KeyEvent{code: KeyCode::Char('?'),..} => {
                     app.toggle_help()
