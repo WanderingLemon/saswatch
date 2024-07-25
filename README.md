@@ -1,3 +1,4 @@
+![Demo Gif](./demo.gif)
 # rusty_colors
 A quick, simple, random color generation tool, written in Rust!
 ## Features
