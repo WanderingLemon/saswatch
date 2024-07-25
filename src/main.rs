@@ -40,7 +40,11 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
 
             match key{
                 KeyEvent{code: KeyCode::Char('q'),..}=> {
-                    return Ok(true);
+                    if app.get_help_screen() {
+                        app.toggle_help()
+                    } else {
+                        return Ok(true);
+                    }
                 }
                 KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                     app.shift_down()
@@ -62,6 +66,9 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 }
                 KeyEvent{code: KeyCode::Char('s'),..} => {
                     app.toggle_lock()
+                }
+                KeyEvent{code: KeyCode::Char('?'),..} => {
+                    app.toggle_help()
                 }
                 KeyEvent{code: KeyCode::Char(' '),..} => {
                     app.regen_unlocked()

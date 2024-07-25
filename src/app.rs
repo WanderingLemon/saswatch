@@ -3,6 +3,7 @@ use std::usize;
 use crate::color::Color;
 
 pub struct App{
+    help_screen: bool,
     entries: usize,
     offset: usize,
     colors: Vec<Color>
@@ -12,6 +13,7 @@ impl App {
     pub fn new() -> App {
         let colors = Vec::from([Color::random_new()]);
         App {
+            help_screen: false,
             entries: 1,
             offset: 0,
             colors
@@ -104,6 +106,18 @@ impl App {
             if !color.locked{
                 *color = Color::random_new();
             }
+        }
+    }
+    
+    pub fn get_help_screen(&self) -> bool {
+        self.help_screen
+    }
+
+    pub fn toggle_help(&mut self) {
+        if !self.help_screen{
+            self.help_screen = true
+        } else {
+            self.help_screen = false
         }
     }
 } 
