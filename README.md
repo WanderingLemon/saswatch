@@ -1,5 +1,5 @@
 ![Demo Gif](./demo.gif)
-# rusty_colors
+# Saswatch
 A quick, simple, random color generation tool, written in Rust!
 ## Features
 - Ability to add practically any number of colors (limited by the `usize` max value which should be more than anyone needs)
@@ -26,5 +26,6 @@ A quick, simple, random color generation tool, written in Rust!
 - [ ] Save colors to a `.toml` file for future loading
 - [ ] Load from a `.toml` to edit a saved set of colors
 - [ ] HSL constraint settings to only generate select ranges of colors
-- [ ] Manual HSL and RGB manipulation sliders
+- [ ] Manual HSL and RGB manipulation slider
 - [ ] HSL color representations
+- [ ] Ability to copy color to clipboard
