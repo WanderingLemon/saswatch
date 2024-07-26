@@ -19,7 +19,9 @@ A quick, simple, random color generation tool, written in Rust!
 | J/Shift+Down | Move selected color down by one, looping at bottom     |
 | a            | Append a new, random color at the bottom of the list   |
 | s            | Toggle the lock state of the selected color            |
+| c            | Copy the selected color's hex code to the system clipboard|
 | Space        | Reroll all unlocked colors                             |
+
 ## Planned Features
 - [ ] Insert a new color in the middle of the list with `n`
 - [ ] Export to a `.sh` file for use in scripting
@@ -28,4 +30,4 @@ A quick, simple, random color generation tool, written in Rust!
 - [ ] HSL constraint settings to only generate select ranges of colors
 - [ ] Manual HSL and RGB manipulation slider
 - [ ] HSL color representations
-- [ ] Ability to copy color to clipboard
+- [x] Ability to copy color to clipboard
