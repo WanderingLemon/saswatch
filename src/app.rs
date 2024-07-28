@@ -1,11 +1,21 @@
-use std::usize;
+use std::{fs::{create_dir, create_dir_all, File}, io::{BufWriter, Result, Write}, usize};
 
 use clipboard::{ClipboardContext, ClipboardProvider};
+use directories::ProjectDirs;
 
 use crate::color::Color;
 
-pub struct App{
+#[derive(PartialEq)]
+pub enum Mode {
+    Generating,
+    Exporting
+}
+
+pub struct App {
     clipboard_ctx: ClipboardContext,
+    app_directories: ProjectDirs,
+    pub input_buffer: String,
+    mode: Mode,
     help_screen: bool,
     entries: usize,
     offset: usize,
@@ -13,15 +23,34 @@ pub struct App{
 }
 
 impl App {
-    pub fn new() -> App {
+    pub fn new() -> Result<App> {
         let colors = Vec::from([Color::random_new()]);
-        App {
+        let app_directories = ProjectDirs::from("dev", "Corax", "Saswatch").expect("Failed to get program directories");
+        
+        let data_dir = app_directories.data_dir();
+        if !data_dir.exists() {
+            create_dir_all(data_dir)?;
+        }
+        
+        let palette_dir = data_dir.join("palettes");
+        if !palette_dir.exists() {
+            create_dir(data_dir.join("palettes"))?;
+        }
+
+        Ok(App {
             clipboard_ctx: ClipboardProvider::new().unwrap(),
+            app_directories,
+            input_buffer: String::new(),
+            mode: Mode::Generating,
             help_screen: false,
             entries: 1,
             offset: 0,
             colors
-        }
+        })
+    }
+
+    pub fn get_mode(&self) -> &Mode {
+        &self.mode
     }
     
     pub fn inc_offset(&mut self) {
@@ -129,5 +158,30 @@ impl App {
         let color = self.colors.get(self.offset).unwrap();
         let hex = color.hex_string();
         let _ = self.clipboard_ctx.set_contents(hex);
+    }
+
+    pub fn toggle_export_menu(&mut self) {
+        if self.mode == Mode::Exporting{
+            self.mode = Mode::Generating;
+        } else {
+            self.mode = Mode::Exporting;
+        }
+    }
+
+    pub fn export_to_sh(&mut self) -> Result<()>{
+        let pallets = self.app_directories.data_dir().join("palettes");
+        let file = File::create(pallets.join(format!("{}.sh", self.input_buffer)))?;
+        let mut writer = BufWriter::new(file);
+
+        let mut counter = 0;
+        for color in self.colors.to_owned() {
+            writer.write_fmt(format_args!("color{}=\"{}\"\n", counter, color.hex_string()))?;
+            counter += 1;
+        }
+        
+        self.input_buffer = String::new();
+        self.mode = Mode::Generating;
+
+        Ok(())
     }
 } 
