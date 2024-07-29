@@ -2,7 +2,7 @@ use std::{fs::{create_dir, create_dir_all, File}, io::{BufWriter, Result, Write}
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use directories::ProjectDirs;
-use ratatui::widgets::TableState;
+use ratatui::widgets::{ScrollbarState, TableState};
 
 use crate::color::Color;
 
@@ -19,7 +19,8 @@ pub struct App {
     mode: Mode,
     help_screen: bool,
     colors: Vec<Color>,
-    color_table_state: TableState
+    color_table_state: TableState,
+    scrollbar_state: ScrollbarState
 }
 
 impl App {
@@ -39,7 +40,8 @@ impl App {
         if !palette_dir.exists() {
             create_dir(data_dir.join("palettes"))?;
         }
-
+        let scrollbar_state = ScrollbarState::new(1)
+            .position(0);
         Ok(App {
             clipboard_ctx: ClipboardProvider::new().unwrap(),
             app_directories,
@@ -47,7 +49,8 @@ impl App {
             mode: Mode::Generating,
             help_screen: false,
             colors,
-            color_table_state
+            color_table_state,
+            scrollbar_state
         })
     }
 
@@ -60,8 +63,10 @@ impl App {
         let entries = self.colors.len();
         if selected < entries-1 {
             self.color_table_state.select(Some(selected+1));
+            self.scrollbar_state.next();
         }else{
             self.color_table_state.select(Some(0));
+            self.scrollbar_state.first();
         }
     }
     
@@ -70,13 +75,16 @@ impl App {
         let entries = self.colors.len();
         if selected > 0 {
             self.color_table_state.select(Some(selected-1));
+            self.scrollbar_state.prev();
         }else {
             self.color_table_state.select(Some(entries-1));
+            self.scrollbar_state.last();
         }
     }
-
+    
     pub fn insert_color(&mut self) {
         self.colors.push(Color::random_new());
+        self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
     }
 
     pub fn remove_color(&mut self) {
@@ -84,8 +92,10 @@ impl App {
         let entries = self.colors.len();
         if entries > 1{
             self.colors.remove(selected);
+            self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
             if selected == entries-1{
                 self.dec_select();
+                self.scrollbar_state.prev();
             }
         }
     }
@@ -103,10 +113,12 @@ impl App {
 
         if selected == 0 {
             self.colors.swap(selected, entries-1);
-            self.color_table_state.select(Some(entries-1))
-        } else {
+            self.color_table_state.select(Some(entries-1));
+            self.scrollbar_state.last();
+       } else {
             self.colors.swap(selected, selected-1);
-            self.color_table_state.select(Some(selected-1))
+            self.color_table_state.select(Some(selected-1));
+            self.scrollbar_state.prev();
         }
     }
 
@@ -119,10 +131,12 @@ impl App {
         
         if selected < entries-1 {
             self.colors.swap(selected, selected+1);
-            self.color_table_state.select(Some(selected+1))
+            self.color_table_state.select(Some(selected+1));
+            self.scrollbar_state.next();
         } else {
             self.colors.swap(selected, 0);
-            self.color_table_state.select(Some(0))
+            self.color_table_state.select(Some(0));
+            self.scrollbar_state.first();
         }
     }
 
@@ -191,5 +205,9 @@ impl App {
 
     pub fn get_table_state(&mut self) -> &mut TableState {
         &mut self.color_table_state
+    }
+
+    pub fn get_scrollbar_state(&mut self) -> &mut ScrollbarState {
+        &mut self.scrollbar_state
     }
 } 

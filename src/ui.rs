@@ -1,4 +1,4 @@
-use ratatui::{layout::{Alignment, Constraint, Direction, Layout}, style::{Color, Modifier, Style, Stylize}, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Table}, Frame};
+use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
 
 use crate::app::{App, Mode};
 
@@ -52,12 +52,36 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             Constraint::Length(17),
             Constraint::Fill(1)
         ];
+ 
+        let generator_layout = Layout::new(Direction::Horizontal, [
+            Constraint::Fill(1),
+            Constraint::Length(2)
+        ]).split(main_layout[0]);
 
-        let table = Table::new(app.get_colors(), widths)
+        let colors = app.get_colors();
+        //let colors_len = colors.len();
+
+        let table = Table::new(colors, widths)
             .widths(widths)
             .highlight_style(Style::new().bold().fg(Color::Cyan));
+        
+        let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+            .begin_symbol(None)
+            .end_symbol(None)
+            .thumb_symbol(block::FULL)
+            .thumb_style(Style::new().gray())
+            .track_symbol(Some(block::FULL))
+            .track_style(Style::new().dark_gray());
 
-        f.render_stateful_widget(table, main_layout[0], app.get_table_state());
+        f.render_stateful_widget(scrollbar, 
+            generator_layout[1].inner(Margin{
+                vertical:0,
+                horizontal:0 
+            }),
+            app.get_scrollbar_state()
+        );
+
+        f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
         f.render_widget(Clear, main_layout[1]);
         f.render_widget(Clear, main_layout[2]);
         f.render_widget(Paragraph::new(Line::from(vec![
