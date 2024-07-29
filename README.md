@@ -20,13 +20,14 @@ A quick, simple, random color generation tool, written in Rust!
 | a            | Append a new, random color at the bottom of the list   |
 | s            | Toggle the lock state of the selected color            |
 | c            | Copy the selected color's hex code to the system clipboard|
+| e            |Enter export mode for the current color palette, exports to .sh|
 | Space        | Reroll all unlocked colors                             |
 
 ## Planned Features
 - [ ] Insert a new color in the middle of the list with `n`
-- [ ] Export to a `.sh` file for use in scripting
-- [ ] Save colors to a `.toml` file for future loading
-- [ ] Load from a `.toml` to edit a saved set of colors
+- [x] Export to a `.sh` file for use in scripting
+- [ ] Save colors to a txt file file for future loading
+- [ ] Load from a txt to edit a saved set of colors
 - [ ] HSL constraint settings to only generate select ranges of colors
 - [ ] Manual HSL and RGB manipulation slider
 - [ ] HSL color representations

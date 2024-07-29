@@ -25,6 +25,7 @@ pub fn ui(f: &mut Frame, app: &App) {
                 Row::new(["a","Append a new, random color at the bottom of the list"]),
                 Row::new(["s","Toggle the lock state of selected color"]),
                 Row::new(["c","Copy the selected color's hex code to the system clipboard"]),
+                Row::new(["e","Enter export mode for the current color palette, exports to .sh"]),
                 Row::new(["Space","Reroll all unlocked colors"]),
             ], [
                 Constraint::Length(16),
