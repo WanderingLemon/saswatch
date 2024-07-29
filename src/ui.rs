@@ -13,41 +13,11 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Constraint::Length(1)
     ]).split(f.size());
 
-    if app.get_help_screen() {
-        let help_table = Table::new([
-            Row::new(["?","Toggle this help screen"]),
-            Row::new(["q","Leaves sub-menu or quits the program when on main screen"]),
-            Row::new(["k/Up","Move up by one color, looping at top"]),
-            Row::new(["j/Down","Move down by one color, looping at bottom"]),
-            Row::new(["K/Shift+Up","Move selected color up by one, looping at top"]),
-            Row::new(["J/Shift+Down","Move selected color down by one, looping at bottom"]),
-            Row::new(["a","Append a new, random color at the bottom of the list"]),
-            Row::new(["s","Toggle the lock state of selected color"]),
-            Row::new(["c","Copy the selected color's hex code to the system clipboard"]),
-            Row::new(["e","Enter export mode for the current color palette, exports to .sh"]),
-            Row::new(["Space","Reroll all unlocked colors"]),
-        ], [
-        Constraint::Length(16),
-        Constraint::Fill(1)
-        ])
-            .block(Block::bordered()
-                .title(Title::from("Help").alignment(Alignment::Center))
-            );
+    let mode = app.get_mode();
 
-        f.render_widget(help_table, 
-            main_layout[0]
-        );
-        f.render_widget(Clear, main_layout[1]);
-        f.render_widget(Block::new().on_black(), main_layout[2]);
-        f.render_widget(Paragraph::new(Line::from(vec![
-                    Span::styled("q", KEY_STYLE),
-                    Span::styled(": Back  ", DESC_STYLE),
-                    Span::styled("?", KEY_STYLE),
-                    Span::styled(": Toggle help", DESC_STYLE)
-        ])).on_black(), main_layout[1]);
-
-    } else {
-        let widths = [
+    match mode{
+        Mode::Generating => {
+            let widths = [
             Constraint::Length(2),
             Constraint::Length(17),
             Constraint::Fill(1)
@@ -112,7 +82,78 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Span::styled(": Help  ", DESC_STYLE),
         ])).on_black(), main_layout[2]);
 
-        if *app.get_mode() == Mode::Exporting {
+        }
+
+        Mode::Help => {
+            let help_table = Table::new([
+                Row::new(["?","Toggle this help screen"]),
+                Row::new(["q","Leaves sub-menu or quits the program when on main screen"]),
+                Row::new(["k/Up","Move up by one color, looping at top"]),
+                Row::new(["j/Down","Move down by one color, looping at bottom"]),
+                Row::new(["K/Shift+Up","Move selected color up by one, looping at top"]),
+                Row::new(["J/Shift+Down","Move selected color down by one, looping at bottom"]),
+                Row::new(["a","Append a new, random color at the bottom of the list"]),
+                Row::new(["s","Toggle the lock state of selected color"]),
+                Row::new(["c","Copy the selected color's hex code to the system clipboard"]),
+                Row::new(["e","Enter export mode for the current color palette, exports to .sh"]),
+                Row::new(["Space","Reroll all unlocked colors"]),
+            ], [
+            Constraint::Length(16),
+            Constraint::Fill(1)
+            ])
+                .block(Block::bordered()
+                    .title(Title::from("Help").alignment(Alignment::Center))
+                );
+
+            f.render_widget(help_table, 
+                main_layout[0]
+            );
+            f.render_widget(Clear, main_layout[1]);
+            f.render_widget(Block::new().on_black(), main_layout[2]);
+            f.render_widget(Paragraph::new(Line::from(vec![
+                        Span::styled("q", KEY_STYLE),
+                        Span::styled(": Back  ", DESC_STYLE),
+                        Span::styled("?", KEY_STYLE),
+                        Span::styled(": Toggle help", DESC_STYLE)
+            ])).on_black(), main_layout[1]);
+
+        }
+        Mode::Exporting => {
+            let widths = [
+                Constraint::Length(2),
+                Constraint::Length(17),
+                Constraint::Fill(1)
+            ];
+
+            let generator_layout = Layout::new(Direction::Horizontal, [
+                Constraint::Fill(1),
+                Constraint::Length(2)
+            ]).split(main_layout[0]);
+
+            let colors = app.get_colors();
+            //let colors_len = colors.len();
+
+            let table = Table::new(colors, widths)
+                .widths(widths)
+                .highlight_style(Style::new().bold().fg(Color::Cyan));
+
+            let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+                .begin_symbol(None)
+                .end_symbol(None)
+                .thumb_symbol(block::FULL)
+                .thumb_style(Style::new().gray())
+                .track_symbol(Some(block::FULL))
+                .track_style(Style::new().dark_gray());
+
+            f.render_stateful_widget(scrollbar, 
+                generator_layout[1].inner(Margin{
+                    vertical:0,
+                    horizontal:0 
+                }),
+                app.get_scrollbar_state()
+            );
+
+            f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
             f.render_widget(Clear, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
             f.render_widget(Paragraph::new(Line::from(vec![
@@ -123,12 +164,11 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             ])).on_black(), main_layout[1]);
 
             f.render_widget(Paragraph::new(Line::from(vec![
-            Span::styled("Exporting to: ", Style::new().light_yellow()),
-            Span::raw(format!("{}.sh",app.input_buffer.clone()))
-        ]))
+                        Span::styled("Exporting to: ", Style::new().light_yellow()),
+                        Span::raw(format!("{}.sh",app.input_buffer.clone()))
+            ]))
                 .on_black().white(),
-                main_layout[2])
-        }
-    }
+                main_layout[2])}
+    } 
 }
 

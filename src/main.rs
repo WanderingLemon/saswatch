@@ -56,11 +56,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 Mode::Generating => {
                     match key{
                         KeyEvent{code: KeyCode::Char('q'),..}=> {
-                            if app.get_help_screen() {
-                                app.toggle_help()
-                            } else {
                                 return Ok(true);
-                            }
                         }
                         KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                             app.shift_down()
@@ -94,6 +90,17 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         }
                         KeyEvent{code: KeyCode::Char(' '),..} => {
                             app.regen_unlocked()
+                        }
+                        _ => {}
+                    }
+                }
+                Mode::Help => {
+                    match key.code {
+                        KeyCode::Char('q') => {
+                            app.toggle_help()
+                        }
+                        KeyCode::Char('?')=> {
+                            app.toggle_help()
                         }
                         _ => {}
                     }

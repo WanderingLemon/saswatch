@@ -9,6 +9,7 @@ use crate::color::Color;
 #[derive(PartialEq)]
 pub enum Mode {
     Generating,
+    Help,
     Exporting
 }
 
@@ -17,7 +18,6 @@ pub struct App {
     app_directories: ProjectDirs,
     pub input_buffer: String,
     mode: Mode,
-    help_screen: bool,
     colors: Vec<Color>,
     color_table_state: TableState,
     scrollbar_state: ScrollbarState
@@ -47,7 +47,6 @@ impl App {
             app_directories,
             input_buffer: String::new(),
             mode: Mode::Generating,
-            help_screen: false,
             colors,
             color_table_state,
             scrollbar_state
@@ -159,15 +158,11 @@ impl App {
         }
     }
     
-    pub fn get_help_screen(&self) -> bool {
-        self.help_screen
-    }
-
     pub fn toggle_help(&mut self) {
-        if !self.help_screen{
-            self.help_screen = true
+        if self.mode != Mode::Help{
+            self.mode = Mode::Help
         } else {
-            self.help_screen = false
+            self.mode = Mode::Generating
         }
     }
 
