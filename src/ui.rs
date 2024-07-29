@@ -112,8 +112,6 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Span::styled(": Help  ", DESC_STYLE),
         ])).on_black(), main_layout[2]);
 
-
-
         if *app.get_mode() == Mode::Exporting {
             f.render_widget(Clear, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
