@@ -69,10 +69,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                             app.shift_up()
                         }
                         KeyEvent{code: KeyCode::Up,..} | KeyEvent{code: KeyCode::Char('k'),..}=> {
-                            app.dec_offset()
+                            app.dec_select()
                         }
                         KeyEvent{code: KeyCode::Down,..} | KeyEvent{code: KeyCode::Char('j'),..}=> {
-                            app.inc_offset()
+                            app.inc_select()
                         }
                         KeyEvent{code: KeyCode::Char('a'),..}=> {
                             app.insert_color()
@@ -101,6 +101,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 Mode::Exporting => {
                     match key.code {
                         KeyCode::Esc => {
+                            app.input_buffer = String::new();
                             app.toggle_export_menu();
                         }
                         KeyCode::Backspace => {
