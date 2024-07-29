@@ -72,9 +72,9 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
         ])).on_black(), main_layout[1]);
         f.render_widget(Paragraph::new(Line::from(vec![
-                    Span::styled("<S-Up>", KEY_STYLE),
+                    Span::styled("K/<S-Up>", KEY_STYLE),
                     Span::styled(": Move selected up  ", DESC_STYLE),
-                    Span::styled("<S-Down>", KEY_STYLE),
+                    Span::styled("J/<S-Down>", KEY_STYLE),
                     Span::styled(": Move selected down  ", DESC_STYLE),
                     Span::styled("q", KEY_STYLE),
                     Span::styled(": Quit  ", DESC_STYLE),
