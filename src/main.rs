@@ -56,11 +56,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                 Mode::Generating => {
                     match key{
                         KeyEvent{code: KeyCode::Char('q'),..}=> {
-                            if app.get_help_screen() {
-                                app.toggle_help()
-                            } else {
                                 return Ok(true);
-                            }
                         }
                         KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                             app.shift_down()
@@ -69,10 +65,10 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                             app.shift_up()
                         }
                         KeyEvent{code: KeyCode::Up,..} | KeyEvent{code: KeyCode::Char('k'),..}=> {
-                            app.dec_offset()
+                            app.dec_select()
                         }
                         KeyEvent{code: KeyCode::Down,..} | KeyEvent{code: KeyCode::Char('j'),..}=> {
-                            app.inc_offset()
+                            app.inc_select()
                         }
                         KeyEvent{code: KeyCode::Char('a'),..}=> {
                             app.insert_color()
@@ -98,9 +94,21 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, app: &mut App) -> io::Result<
                         _ => {}
                     }
                 }
+                Mode::Help => {
+                    match key.code {
+                        KeyCode::Char('q') => {
+                            app.toggle_help()
+                        }
+                        KeyCode::Char('?')=> {
+                            app.toggle_help()
+                        }
+                        _ => {}
+                    }
+                }
                 Mode::Exporting => {
                     match key.code {
                         KeyCode::Esc => {
+                            app.input_buffer = String::new();
                             app.toggle_export_menu();
                         }
                         KeyCode::Backspace => {

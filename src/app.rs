@@ -1,13 +1,15 @@
-use std::{fs::{create_dir, create_dir_all, File}, io::{BufWriter, Result, Write}, usize};
+use std::{fs::{create_dir, create_dir_all, File}, io::{BufWriter, Result, Write}};
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use directories::ProjectDirs;
+use ratatui::widgets::{ScrollbarState, TableState};
 
 use crate::color::Color;
 
 #[derive(PartialEq)]
 pub enum Mode {
     Generating,
+    Help,
     Exporting
 }
 
@@ -16,14 +18,16 @@ pub struct App {
     app_directories: ProjectDirs,
     pub input_buffer: String,
     mode: Mode,
-    help_screen: bool,
-    entries: usize,
-    offset: usize,
-    colors: Vec<Color>
+    colors: Vec<Color>,
+    color_table_state: TableState,
+    scrollbar_state: ScrollbarState
 }
 
 impl App {
     pub fn new() -> Result<App> {
+        let mut color_table_state = TableState::default();
+        color_table_state.select(Some(0)); 
+
         let colors = Vec::from([Color::random_new()]);
         let app_directories = ProjectDirs::from("dev", "Corax", "Saswatch").expect("Failed to get program directories");
         
@@ -36,16 +40,16 @@ impl App {
         if !palette_dir.exists() {
             create_dir(data_dir.join("palettes"))?;
         }
-
+        let scrollbar_state = ScrollbarState::new(1)
+            .position(0);
         Ok(App {
             clipboard_ctx: ClipboardProvider::new().unwrap(),
             app_directories,
             input_buffer: String::new(),
             mode: Mode::Generating,
-            help_screen: false,
-            entries: 1,
-            offset: 0,
-            colors
+            colors,
+            color_table_state,
+            scrollbar_state
         })
     }
 
@@ -53,40 +57,45 @@ impl App {
         &self.mode
     }
     
-    pub fn inc_offset(&mut self) {
-        if self.offset < self.entries-1 {
-            self.offset += 1;
+    pub fn inc_select(&mut self) {
+        let selected = self.color_table_state.selected().unwrap();
+        let entries = self.colors.len();
+        if selected < entries-1 {
+            self.color_table_state.select(Some(selected+1));
+            self.scrollbar_state.next();
         }else{
-            self.offset = 0;
+            self.color_table_state.select(Some(0));
+            self.scrollbar_state.first();
         }
     }
     
-    pub fn dec_offset(&mut self) {
-        if self.offset > 0 {
-            self.offset -= 1;
+    pub fn dec_select(&mut self) {
+        let selected = self.color_table_state.selected().unwrap();
+        let entries = self.colors.len();
+        if selected > 0 {
+            self.color_table_state.select(Some(selected-1));
+            self.scrollbar_state.prev();
         }else {
-            self.offset = self.entries-1;
+            self.color_table_state.select(Some(entries-1));
+            self.scrollbar_state.last();
         }
     }
-
-    pub fn get_offset(&self) -> usize {
-        self.offset
-    }
-
+    
     pub fn insert_color(&mut self) {
         self.colors.push(Color::random_new());
-        self.entries += 1;
+        self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
     }
 
     pub fn remove_color(&mut self) {
-        let offset = self.offset;
-        let entries = self.entries;
+        let selected = self.color_table_state.selected().unwrap();
+        let entries = self.colors.len();
         if entries > 1{
-            self.colors.remove(offset);
-            if offset == entries-1{
-                self.dec_offset();
+            self.colors.remove(selected);
+            self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
+            if selected == entries-1{
+                self.dec_select();
+                self.scrollbar_state.prev();
             }
-            self.entries -= 1;
         }
     }
 
@@ -95,37 +104,44 @@ impl App {
     }
 
     pub fn shift_up(&mut self) {
-        if self.entries <= 1{
+        let selected = self.color_table_state.selected().unwrap();
+        let entries = self.colors.len();
+        if entries <= 1{
             return
         }
 
-        let offset = self.offset;
-        if offset == 0 {
-            self.colors.swap(self.offset, self.entries-1);
-            self.offset = self.entries - 1;
-        } else {
-            self.colors.swap(self.offset, self.offset-1);
-            self.offset -= 1;
+        if selected == 0 {
+            self.colors.swap(selected, entries-1);
+            self.color_table_state.select(Some(entries-1));
+            self.scrollbar_state.last();
+       } else {
+            self.colors.swap(selected, selected-1);
+            self.color_table_state.select(Some(selected-1));
+            self.scrollbar_state.prev();
         }
     }
 
     pub fn shift_down(&mut self) {
-        if self.entries <= 1{
+        let selected = self.color_table_state.selected().unwrap();
+        let entries = self.colors.len();
+        if entries <= 1{
             return
         }
         
-        let offset = self.offset;
-        if offset < self.entries-1 {
-            self.colors.swap(self.offset, self.offset+1);
-            self.offset += 1;
+        if selected < entries-1 {
+            self.colors.swap(selected, selected+1);
+            self.color_table_state.select(Some(selected+1));
+            self.scrollbar_state.next();
         } else {
-            self.colors.swap(self.offset, 0);
-            self.offset = 0;
+            self.colors.swap(selected, 0);
+            self.color_table_state.select(Some(0));
+            self.scrollbar_state.first();
         }
     }
 
     pub fn toggle_lock(&mut self) {
-        let color = self.colors.get_mut(self.offset).unwrap();
+        let selected = self.color_table_state.selected().unwrap();
+        let color = self.colors.get_mut(selected).unwrap();
         if !color.locked {
             color.locked = true;
         } else {
@@ -142,26 +158,23 @@ impl App {
         }
     }
     
-    pub fn get_help_screen(&self) -> bool {
-        self.help_screen
-    }
-
     pub fn toggle_help(&mut self) {
-        if !self.help_screen{
-            self.help_screen = true
+        if self.mode != Mode::Help{
+            self.mode = Mode::Help
         } else {
-            self.help_screen = false
+            self.mode = Mode::Generating
         }
     }
 
     pub fn copy_hex(&mut self) {
-        let color = self.colors.get(self.offset).unwrap();
+        let selected = self.color_table_state.selected().unwrap();
+        let color = self.colors.get(selected).unwrap();
         let hex = color.hex_string();
         let _ = self.clipboard_ctx.set_contents(hex);
     }
 
     pub fn toggle_export_menu(&mut self) {
-        if self.mode == Mode::Exporting{
+        if self.mode == Mode::Exporting {
             self.mode = Mode::Generating;
         } else {
             self.mode = Mode::Exporting;
@@ -183,5 +196,13 @@ impl App {
         self.mode = Mode::Generating;
 
         Ok(())
+    }
+
+    pub fn get_table_state(&mut self) -> &mut TableState {
+        &mut self.color_table_state
+    }
+
+    pub fn get_scrollbar_state(&mut self) -> &mut ScrollbarState {
+        &mut self.scrollbar_state
     }
 } 
