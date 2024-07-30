@@ -1,13 +1,13 @@
 Output demo.gif
 
 Set Shell "zsh"
-Set FontSize 32
-Set Width 1800
+Set FontSize 24
+Set Width 1600
 Set Height 800
 
-Type "./rusty_colors" Sleep 500ms Enter Sleep 2s
-Type "?" Sleep 5s
-Type "?" Sleep 5s
+Type "./saswatch" Sleep 500ms Enter Sleep 1s
+Type "?" Sleep 3s
+Type "?" Sleep 2s
 Type "a" Sleep 500ms
 Type "a" Sleep 500ms
 Type "a" Sleep 500ms
@@ -28,5 +28,8 @@ Type " " Sleep 1s
 
 Type "KK" Sleep 1s
 Type "jj" Sleep 500ms
-Type "KK" Sleep 1ms
+Type "KK" Sleep 1s
+
+Type "e" Sleep 500ms
+Type "save_for_later" Sleep 1s Enter Sleep 1s 
 Sleep 3s
