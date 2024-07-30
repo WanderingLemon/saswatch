@@ -1,4 +1,4 @@
-use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
+use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Borders, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
 
 use crate::app::{App, Mode};
 
@@ -8,10 +8,17 @@ const DESC_STYLE:Style = Style::new().fg(Color::White);
 pub fn ui(f: &mut Frame, app: &mut App) {
     
     let main_layout = Layout::new(Direction::Vertical, [
+        Constraint::Length(1),
         Constraint::Fill(1),
         Constraint::Length(1),
         Constraint::Length(1)
     ]).split(f.size());
+    
+    f.render_widget(Paragraph::new("Saswatch")
+        .bold()
+        .centered()
+        , 
+        main_layout[0]);    
 
     let mode = app.get_mode();
 
@@ -26,10 +33,9 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         let generator_layout = Layout::new(Direction::Horizontal, [
             Constraint::Fill(1),
             Constraint::Length(2)
-        ]).split(main_layout[0]);
+        ]).split(main_layout[1]);
 
         let colors = app.get_colors();
-        //let colors_len = colors.len();
 
         let table = Table::new(colors, widths)
             .widths(widths)
@@ -52,8 +58,8 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         );
 
         f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
-        f.render_widget(Clear, main_layout[1]);
         f.render_widget(Clear, main_layout[2]);
+        f.render_widget(Clear, main_layout[3]);
         f.render_widget(Paragraph::new(Line::from(vec![
                     Span::styled("k/\u{2191}", KEY_STYLE),
                     Span::styled(": Up  ", DESC_STYLE),
@@ -70,7 +76,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Span::styled("Space", KEY_STYLE),
                     Span::styled(": Reroll  ", DESC_STYLE),
 
-        ])).on_black(), main_layout[1]);
+        ])).on_black(), main_layout[2]);
         f.render_widget(Paragraph::new(Line::from(vec![
                     Span::styled("K/<S-\u{2191}>", KEY_STYLE),
                     Span::styled(": Move selected up  ", DESC_STYLE),
@@ -80,7 +86,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                     Span::styled(": Quit  ", DESC_STYLE),
                     Span::styled("?", KEY_STYLE),
                     Span::styled(": Help  ", DESC_STYLE),
-        ])).on_black(), main_layout[2]);
+        ])).on_black(), main_layout[3]);
 
         }
 
@@ -106,16 +112,17 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                 );
 
             f.render_widget(help_table, 
-                main_layout[0]
+                main_layout[1]
             );
-            f.render_widget(Clear, main_layout[1]);
-            f.render_widget(Block::new().on_black(), main_layout[2]);
+
+            f.render_widget(Clear, main_layout[2]);
+            f.render_widget(Block::new().on_black(), main_layout[3]);
             f.render_widget(Paragraph::new(Line::from(vec![
                         Span::styled("q", KEY_STYLE),
                         Span::styled(": Back  ", DESC_STYLE),
                         Span::styled("?", KEY_STYLE),
                         Span::styled(": Toggle help", DESC_STYLE)
-            ])).on_black(), main_layout[1]);
+            ])).on_black(), main_layout[2]);
 
         }
         Mode::Exporting => {
@@ -128,7 +135,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             let generator_layout = Layout::new(Direction::Horizontal, [
                 Constraint::Fill(1),
                 Constraint::Length(2)
-            ]).split(main_layout[0]);
+            ]).split(main_layout[1]);
 
             let colors = app.get_colors();
             //let colors_len = colors.len();
@@ -154,21 +161,21 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             );
 
             f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
-            f.render_widget(Clear, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
+            f.render_widget(Clear, main_layout[3]);
             f.render_widget(Paragraph::new(Line::from(vec![
                         Span::styled("ESC", KEY_STYLE),
                         Span::styled(": Back  ", DESC_STYLE),
                         Span::styled("Enter", KEY_STYLE),
                         Span::styled(": Export", DESC_STYLE)
-            ])).on_black(), main_layout[1]);
+            ])).on_black(), main_layout[2]);
 
             f.render_widget(Paragraph::new(Line::from(vec![
                         Span::styled("Exporting to: ", Style::new().light_yellow()),
                         Span::raw(format!("{}.sh",app.input_buffer.clone()))
             ]))
                 .on_black().white(),
-                main_layout[2])}
+                main_layout[3])}
     } 
 }
 
