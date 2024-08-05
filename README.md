@@ -29,6 +29,6 @@ A quick, simple, random color generation tool, written in Rust!
 - [ ] Save colors to a txt file file for future loading
 - [ ] Load from a txt to edit a saved set of colors
 - [ ] HSL constraint settings to only generate select ranges of colors
-- [ ] Manual HSL and RGB manipulation slider
-- [ ] HSL color representations
+- [ ] Manual HSL manipulation slider
+- [x] HSL color representations
 - [x] Ability to copy color to clipboard

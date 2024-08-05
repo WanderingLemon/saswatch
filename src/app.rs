@@ -4,13 +4,13 @@ use clipboard::{ClipboardContext, ClipboardProvider};
 use directories::ProjectDirs;
 use ratatui::widgets::{ScrollbarState, TableState};
 
-use crate::color::Color;
-
+use crate::color::{Color, Constraints};
+ 
 #[derive(PartialEq)]
 pub enum Mode {
     Generating,
     Help,
-    Exporting
+    Exporting,
 }
 
 pub struct App {
@@ -20,15 +20,16 @@ pub struct App {
     mode: Mode,
     colors: Vec<Color>,
     color_table_state: TableState,
-    scrollbar_state: ScrollbarState
+    scrollbar_state: ScrollbarState,
+    pub constraints: Constraints
 }
 
 impl App {
     pub fn new() -> Result<App> {
         let mut color_table_state = TableState::default();
         color_table_state.select(Some(0)); 
-
-        let colors = Vec::from([Color::random_new()]);
+        let constraints = Constraints::new();
+        let colors = Vec::from([Color::random_new(constraints.clone())]);
         let app_directories = ProjectDirs::from("dev", "Corax", "Saswatch").expect("Failed to get program directories");
         
         let data_dir = app_directories.data_dir();
@@ -49,7 +50,8 @@ impl App {
             mode: Mode::Generating,
             colors,
             color_table_state,
-            scrollbar_state
+            scrollbar_state,
+            constraints
         })
     }
 
@@ -82,7 +84,8 @@ impl App {
     }
     
     pub fn insert_color(&mut self) {
-        self.colors.push(Color::random_new());
+        let constraints = Constraints::new();
+        self.colors.push(Color::random_new(constraints));
         self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
     }
 
@@ -153,7 +156,7 @@ impl App {
         let colors = self.colors.iter_mut();
         for color in colors {
             if !color.locked{
-                *color = Color::random_new();
+                color.regen(self.constraints.clone());
             }
         }
     }

@@ -1,4 +1,4 @@
-use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Borders, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
+use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
 
 use crate::app::{App, Mode};
 
@@ -26,7 +26,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Mode::Generating => {
             let widths = [
             Constraint::Length(2),
-            Constraint::Length(17),
+            Constraint::Length(20 ),
             Constraint::Fill(1)
         ];
  
@@ -175,7 +175,8 @@ pub fn ui(f: &mut Frame, app: &mut App) {
                         Span::raw(format!("{}.sh",app.input_buffer.clone()))
             ]))
                 .on_black().white(),
-                main_layout[3])}
-    } 
+                main_layout[3])
+        }
+    }
 }
 
