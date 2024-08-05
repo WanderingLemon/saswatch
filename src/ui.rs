@@ -1,4 +1,4 @@
-use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Borders, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
+use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
 
 use crate::app::{App, Mode};
 
