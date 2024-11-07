@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 clipboard = "0.5.0"
-crossterm = "0.27.0"
+crossterm = "0.28.1"
 directories = "5.0.1"
 palette = "0.7.6"
 rand = "0.8.5"
-ratatui = { version = "0.27.0", features = ["palette"] }
+ratatui = { version = "0.29.0", features = ["palette"] }
