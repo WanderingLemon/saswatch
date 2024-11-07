@@ -1,10 +1,11 @@
-use std::{fs::{create_dir, create_dir_all, File}, io::{BufWriter, Result, Write}};
+use std::{fs::{create_dir, create_dir_all, File}, io::{self, BufWriter, Result, Write}};
 
 use clipboard::{ClipboardContext, ClipboardProvider};
+use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 use directories::ProjectDirs;
-use ratatui::widgets::{ScrollbarState, TableState};
+use ratatui::{prelude::Backend, widgets::{ScrollbarState, TableState}, Terminal};
 
-use crate::color::{Color, Constraints};
+use crate::{color::{Color, Constraints}, ui};
  
 #[derive(PartialEq)]
 pub enum Mode {
@@ -53,6 +54,117 @@ impl App {
             scrollbar_state,
             constraints
         })
+    }
+
+    pub fn run<B: Backend>(&mut self, terminal: &mut Terminal<B>)-> io::Result<bool> {
+        loop {
+            if let Err(_res) = terminal.draw(|f| ui(f, self)){
+                return Ok(false)
+}
+
+            if let Event::Key(key) = event::read()? {
+                if key.kind == event::KeyEventKind::Release {
+                    continue;
+               }
+
+                if let Some(result) = self.handle_input(key){
+                    return result
+                }
+            
+            }    
+        }
+    }
+    
+    pub fn handle_input(&mut self, key: KeyEvent) -> Option<io::Result<bool>> {
+                match self.mode {
+                    Mode::Generating => {
+                        match key {
+                            KeyEvent{code: KeyCode::Char('q'), ..} => { return Some(Ok(true))}
+
+                        KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
+                            self.shift_down()
+                        }
+
+                        KeyEvent{code: KeyCode::Up,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('K'),..}=> {
+                            self.shift_up()
+                        }
+                    
+                        KeyEvent{code: KeyCode::Up,..} | KeyEvent{code: KeyCode::Char('k'),..}=> {
+                            self.dec_select()
+                        }
+
+                        KeyEvent{code: KeyCode::Down,..} | KeyEvent{code: KeyCode::Char('j'),..}=> {
+                            self.inc_select()
+                        }
+
+                        KeyEvent{code: KeyCode::Char('a'),..}=> {
+                            self.insert_color()
+                        }
+
+                        KeyEvent{code: KeyCode::Char('d'),..} => {
+                            self.remove_color()
+                        }
+                        
+                        KeyEvent{code: KeyCode::Char('s'),..} => {
+                            self.toggle_lock()
+                        }
+
+                        KeyEvent{code: KeyCode::Char('c'),..} => {
+                            self.copy_hex()
+                        }
+
+                        KeyEvent{code: KeyCode::Char('?'),..} => {
+                            self.mode = Mode::Help
+                        }
+
+                        KeyEvent{code: KeyCode::Char('e'),..} => {
+                            self.mode = Mode::Exporting
+                        }
+
+                        KeyEvent{code: KeyCode::Char(' '),..} => {
+                            self.regen_unlocked()
+                        }
+                            _ => {}
+                        }
+                    }
+
+                    Mode::Help => {
+                        match key.code {
+                            KeyCode::Char('q') | KeyCode::Char('?') => {
+                                self.mode = Mode::Generating
+                            }
+
+                            _ => {}
+                        }
+                    }
+
+                    Mode::Exporting => {
+                        match key.code {
+                            KeyCode::Esc => {
+                                self.input_buffer = String::new();
+                                self.mode = Mode::Generating;
+                            }
+
+                            KeyCode::Backspace => {
+                                self.input_buffer.pop();
+                            }
+
+                            KeyCode::Enter => {
+                                let result = self.export_to_sh();
+                                if result.is_err() {
+                                    return Some(Ok(false))
+                                }
+                            }
+
+                            KeyCode::Char(ch) => {
+                                self.input_buffer.push(ch);
+                            }
+
+                            _ => {}
+                        }
+                    }
+                }
+        return None
     }
 
     pub fn get_mode(&self) -> &Mode {
@@ -161,27 +273,11 @@ impl App {
         }
     }
     
-    pub fn toggle_help(&mut self) {
-        if self.mode != Mode::Help{
-            self.mode = Mode::Help
-        } else {
-            self.mode = Mode::Generating
-        }
-    }
-
     pub fn copy_hex(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let color = self.colors.get(selected).unwrap();
         let hex = color.hex_string();
         let _ = self.clipboard_ctx.set_contents(hex);
-    }
-
-    pub fn toggle_export_menu(&mut self) {
-        if self.mode == Mode::Exporting {
-            self.mode = Mode::Generating;
-        } else {
-            self.mode = Mode::Exporting;
-        }
     }
 
     pub fn export_to_sh(&mut self) -> Result<()>{
