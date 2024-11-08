@@ -1,5 +1,5 @@
 use ratatui::{
-    layout::{Constraint, Direction, Layout, Margin}, 
+    layout::{Constraint, Direction, Layout, Margin, Rect}, 
     style::{Color, Modifier, Style, Stylize}, 
     symbols::block, 
     text::{Line, Span}, 
@@ -13,87 +13,53 @@ const KEY_STYLE:Style = Style::new().fg(Color::LightBlue).add_modifier(Modifier:
 const DESC_STYLE:Style = Style::new().fg(Color::White);
 
 pub fn ui(f: &mut Frame, app: &mut App) {
-    
+
     let main_layout = Layout::new(Direction::Vertical, [
         Constraint::Length(1),
         Constraint::Fill(1),
         Constraint::Length(1),
         Constraint::Length(1)
     ]).split(f.area());
-    
+
     f.render_widget(Paragraph::new("Saswatch")
         .bold()
-        .centered()
-        , 
+        .centered(), 
         main_layout[0]);    
 
     let mode = app.get_mode();
 
     match mode{
         Mode::Generating => {
-            let widths = [
-            Constraint::Length(2),
-            Constraint::Length(20 ),
-            Constraint::Fill(1)
-        ];
- 
-        let generator_layout = Layout::new(Direction::Horizontal, [
-            Constraint::Fill(1),
-            Constraint::Length(2)
-        ]).split(main_layout[1]);
+            render_main_section(f, app, main_layout[1]);
+            f.render_widget(Clear, main_layout[2]);
+            f.render_widget(Clear, main_layout[3]);
+            f.render_widget(Paragraph::new(Line::from(vec![
+                        Span::styled("k/\u{2191}", KEY_STYLE),
+                        Span::styled(": Up  ", DESC_STYLE),
+                        Span::styled("j/\u{2193}", KEY_STYLE),
+                        Span::styled(": Down  ", DESC_STYLE),
+                        Span::styled("s", KEY_STYLE),
+                        Span::styled(": Toggle color lock  ", DESC_STYLE),
+                        Span::styled("a", KEY_STYLE),
+                        Span::styled(": Append new  ", DESC_STYLE),
+                        Span::styled("c", KEY_STYLE),
+                        Span::styled(": Copy hex  ", DESC_STYLE),
+                        Span::styled("e", KEY_STYLE),
+                        Span::styled(": Export  ", DESC_STYLE),
+                        Span::styled("Space", KEY_STYLE),
+                        Span::styled(": Reroll  ", DESC_STYLE),
 
-        let colors = app.get_colors();
-
-        let table = Table::new(colors, widths)
-            .widths(widths)
-            .cell_highlight_style(Style::new().bold().fg(Color::Cyan));
-        
-        let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-            .begin_symbol(None)
-            .end_symbol(None)
-            .thumb_symbol(block::FULL)
-            .thumb_style(Style::new().gray())
-            .track_symbol(Some(block::FULL))
-            .track_style(Style::new().dark_gray());
-
-        f.render_stateful_widget(scrollbar, 
-            generator_layout[1].inner(Margin{
-                vertical:0,
-                horizontal:0 
-            }),
-            app.get_scrollbar_state()
-        );
-
-        f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
-        f.render_widget(Clear, main_layout[2]);
-        f.render_widget(Clear, main_layout[3]);
-        f.render_widget(Paragraph::new(Line::from(vec![
-                    Span::styled("k/\u{2191}", KEY_STYLE),
-                    Span::styled(": Up  ", DESC_STYLE),
-                    Span::styled("j/\u{2193}", KEY_STYLE),
-                    Span::styled(": Down  ", DESC_STYLE),
-                    Span::styled("s", KEY_STYLE),
-                    Span::styled(": Toggle color lock  ", DESC_STYLE),
-                    Span::styled("a", KEY_STYLE),
-                    Span::styled(": Append new  ", DESC_STYLE),
-                    Span::styled("c", KEY_STYLE),
-                    Span::styled(": Copy hex  ", DESC_STYLE),
-                    Span::styled("e", KEY_STYLE),
-                    Span::styled(": Export  ", DESC_STYLE),
-                    Span::styled("Space", KEY_STYLE),
-                    Span::styled(": Reroll  ", DESC_STYLE),
-
-        ])).on_black(), main_layout[2]);
-        f.render_widget(Paragraph::new(Line::from(vec![
-                    Span::styled("K/<S-\u{2191}>", KEY_STYLE),
-                    Span::styled(": Move selected up  ", DESC_STYLE),
-                    Span::styled("J/<S-\u{2193}>", KEY_STYLE),
-                    Span::styled(": Move selected down  ", DESC_STYLE),
-                    Span::styled("q", KEY_STYLE),
-                    Span::styled(": Quit  ", DESC_STYLE),
-                    Span::styled("?", KEY_STYLE),
-                    Span::styled(": Help  ", DESC_STYLE),
-        ])).on_black(), main_layout[3]);
+            ])).on_black(), main_layout[2]);
+            f.render_widget(Paragraph::new(Line::from(vec![
+                        Span::styled("K/<S-\u{2191}>", KEY_STYLE),
+                        Span::styled(": Move selected up  ", DESC_STYLE),
+                        Span::styled("J/<S-\u{2193}>", KEY_STYLE),
+                        Span::styled(": Move selected down  ", DESC_STYLE),
+                        Span::styled("q", KEY_STYLE),
+                        Span::styled(": Quit  ", DESC_STYLE),
+                        Span::styled("?", KEY_STYLE),
+                        Span::styled(": Help  ", DESC_STYLE),
+            ])).on_black(), main_layout[3]);
 
         }
 
@@ -133,40 +99,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
         }
         Mode::Exporting => {
-            let widths = [
-                Constraint::Length(2),
-                Constraint::Length(17),
-                Constraint::Fill(1)
-            ];
-
-            let generator_layout = Layout::new(Direction::Horizontal, [
-                Constraint::Fill(1),
-                Constraint::Length(2)
-            ]).split(main_layout[1]);
-
-            let colors = app.get_colors();
-
-            let table = Table::new(colors, widths)
-                .widths(widths)
-                .row_highlight_style(Style::new().bold().fg(Color::Cyan));
-
-            let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
-                .begin_symbol(None)
-                .end_symbol(None)
-                .thumb_symbol(block::FULL)
-                .thumb_style(Style::new().gray())
-                .track_symbol(Some(block::FULL))
-                .track_style(Style::new().dark_gray());
-
-            f.render_stateful_widget(scrollbar, 
-                generator_layout[1].inner(Margin{
-                    vertical:0,
-                    horizontal:0 
-                }),
-                app.get_scrollbar_state()
-            );
-
-            f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
+            render_main_section(f, app, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
             f.render_widget(Clear, main_layout[3]);
             f.render_widget(Paragraph::new(Line::from(vec![
@@ -186,3 +119,39 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     }
 }
 
+fn render_main_section(f: &mut Frame, app: &mut App, area: Rect) {
+    let widths = [
+        Constraint::Length(2),
+        Constraint::Length(20),
+        Constraint::Fill(1)
+    ];
+
+    let generator_layout = Layout::new(Direction::Horizontal, [
+        Constraint::Fill(1),
+        Constraint::Length(2)
+    ]).split(area);
+
+    let colors = app.get_colors();
+
+    let table = Table::new(colors, widths)
+        .widths(widths)
+        .cell_highlight_style(Style::new().bold().fg(Color::Cyan));
+
+    let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
+        .begin_symbol(None)
+        .end_symbol(None)
+        .thumb_symbol(block::FULL)
+        .thumb_style(Style::new().gray())
+        .track_symbol(Some(block::FULL))
+        .track_style(Style::new().dark_gray());
+
+    f.render_stateful_widget(scrollbar, 
+        generator_layout[1].inner(Margin{
+            vertical:0,
+            horizontal:0 
+        }),
+        app.get_scrollbar_state()
+    );
+
+    f.render_stateful_widget(table, generator_layout[0], app.get_table_state());
+}
