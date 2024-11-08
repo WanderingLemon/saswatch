@@ -52,8 +52,8 @@ impl Color {
     }
 }
 
-impl Into<Row<'_>> for Color {
-    fn into(self) -> Row<'static> {
+impl <'a> Into<Row<'a>> for Color {
+    fn into(self) -> Row<'a> {
         let rgb: Srgb<u8> = Srgb::from_color_unclamped(self.okhsl).into();
         let hsl = self.okhsl;
         let lock_icon = if self.locked {"\u{1f512}"} else {"\u{1f513}"};
