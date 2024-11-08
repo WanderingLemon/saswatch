@@ -63,18 +63,16 @@ impl App {
         })
     }
 
-    pub fn run<B: Backend>(&mut self, terminal: &mut Terminal<B>)-> io::Result<bool> {
+    pub fn run<B: Backend>(&mut self, terminal: &mut Terminal<B>)-> io::Result<()> {
         loop {
-            if let Err(_res) = terminal.draw(|f| ui(f, self)){
-                return Ok(false)
-}
+            terminal.draw(|f| ui(f, self))?;
 
             if let Event::Key(key) = event::read()? {
                 if key.kind == event::KeyEventKind::Release {
                     continue;
                }
 
-                if let Some(result) = self.handle_input(key){
+                if let Some(result) = self.handle_input(key) {
                     return result
                 }
             
@@ -82,11 +80,11 @@ impl App {
         }
     }
     
-    pub fn handle_input(&mut self, key: KeyEvent) -> Option<io::Result<bool>> {
+    pub fn handle_input(&mut self, key: KeyEvent) -> Option<io::Result<()>> {
                 match self.mode {
                     Mode::Generating => {
                         match key {
-                            KeyEvent{code: KeyCode::Char('q'), ..} => { return Some(Ok(true))}
+                        KeyEvent{code: KeyCode::Char('q'), ..} => { return Some(Ok(()))}
 
                         KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                             self.shift_down()
@@ -157,10 +155,7 @@ impl App {
                             }
 
                             KeyCode::Enter => {
-                                let result = self.export_to_sh();
-                                if result.is_err() {
-                                    return Some(Ok(false))
-                                }
+                                return Some(self.export_to_sh())
                             }
 
                             KeyCode::Char(ch) => {
