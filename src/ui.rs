@@ -46,7 +46,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
         let table = Table::new(colors, widths)
             .widths(widths)
-            .row_highlight_style(Style::new().bold().fg(Color::Cyan));
+            .cell_highlight_style(Style::new().bold().fg(Color::Cyan));
         
         let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(None)
