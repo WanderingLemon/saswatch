@@ -7,7 +7,11 @@ use core::panic;
 use std::{error::Error, io::{self}};
 
 use app::App;
-use crossterm::{event::{DisableMouseCapture, EnableMouseCapture}, execute, terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}};
+use crossterm::{
+    event::{DisableMouseCapture, EnableMouseCapture}, 
+    execute, 
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}
+};
 use ratatui::{backend::CrosstermBackend, Terminal};
 use ui::ui;
 

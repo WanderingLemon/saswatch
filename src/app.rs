@@ -1,9 +1,16 @@
-use std::{fs::{create_dir, create_dir_all, File}, io::{self, BufWriter, Result, Write}};
+use std::{
+    fs::{create_dir, create_dir_all, File}, 
+    io::{self, BufWriter, Result, Write}
+};
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
 use directories::ProjectDirs;
-use ratatui::{prelude::Backend, widgets::{ScrollbarState, TableState}, Terminal};
+use ratatui::{
+    prelude::Backend, 
+    widgets::{ScrollbarState, TableState}, 
+    Terminal
+};
 
 use crate::{color::{Color, Constraints}, ui};
  
