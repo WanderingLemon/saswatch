@@ -3,43 +3,31 @@ mod app;
 mod color;
 mod files;
 
-use core::panic;
-use std::{error::Error, io::{self}};
+use std::{
+    io, 
+    panic::{set_hook, take_hook}
+};
 
 use app::App;
-use crossterm::{
-    event::{DisableMouseCapture, EnableMouseCapture}, 
-    execute, 
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen}
-};
-use ratatui::{backend::CrosstermBackend, Terminal};
+use ratatui::{init, restore, try_restore};
 use ui::ui;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> io::Result<()> {
+    init_panic_hook();
     let app = App::new();
-
-    if app.is_err() {
-        panic!("Encountered an error instantiating the application");
-    }
-    
-    enable_raw_mode()?;
-    let mut stdout = io::stderr();
-    execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
-    let backend = CrosstermBackend::new(stdout);
-    let mut terminal = Terminal::new(backend)?;
+    let mut terminal = init();
 
     let result = app?.run(&mut terminal);
-
-    disable_raw_mode()?;
-    execute!(terminal.backend_mut(), LeaveAlternateScreen, DisableMouseCapture)?;
-    terminal.show_cursor()?;
-    
-    match result{
-        Err(..) => {
-            println!("There was an error!");
-        },
-        _ =>{}
+    if let Err(err) = try_restore(){
+        eprintln!("Failed to restore the terminal! You may need to restore it yourself!: {err}")
     }
+    result
+}
 
-    Ok(())
+fn init_panic_hook(){
+    let original_hook= take_hook();
+    set_hook(Box::new(move |info|{
+        restore(); 
+        original_hook(info);
+    }));
 }
