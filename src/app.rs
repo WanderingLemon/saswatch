@@ -228,7 +228,8 @@ impl App {
         }
 
         if selected == 0 {
-            self.colors.swap(selected, entries-1);
+            let color = self.colors.remove(selected);
+            self.colors.push(color);
             self.color_table_state.select(Some(entries-1));
             self.scrollbar_state.last();
        } else {
@@ -250,7 +251,8 @@ impl App {
             self.color_table_state.select(Some(selected+1));
             self.scrollbar_state.next();
         } else {
-            self.colors.swap(selected, 0);
+            let color = self.colors.pop().unwrap();
+            self.colors.insert(0, color);
             self.color_table_state.select(Some(0));
             self.scrollbar_state.first();
         }
