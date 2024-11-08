@@ -1,4 +1,11 @@
-use ratatui::{layout::{Alignment, Constraint, Direction, Layout, Margin}, style::{Color, Modifier, Style, Stylize}, symbols::block, text::{Line, Span}, widgets::{block::Title, Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table}, Frame};
+use ratatui::{
+    layout::{Constraint, Direction, Layout, Margin}, 
+    style::{Color, Modifier, Style, Stylize}, 
+    symbols::block, 
+    text::{Line, Span}, 
+    widgets::{Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table},
+    Frame
+};
 
 use crate::app::{App, Mode};
 
@@ -12,7 +19,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Constraint::Fill(1),
         Constraint::Length(1),
         Constraint::Length(1)
-    ]).split(f.size());
+    ]).split(f.area());
     
     f.render_widget(Paragraph::new("Saswatch")
         .bold()
@@ -39,7 +46,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
         let table = Table::new(colors, widths)
             .widths(widths)
-            .highlight_style(Style::new().bold().fg(Color::Cyan));
+            .row_highlight_style(Style::new().bold().fg(Color::Cyan));
         
         let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(None)
@@ -108,7 +115,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             Constraint::Fill(1)
             ])
                 .block(Block::bordered()
-                    .title(Title::from("Help").alignment(Alignment::Center))
+                    .title_top(Line::from("Help").centered())
                 );
 
             f.render_widget(help_table, 
@@ -138,11 +145,10 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             ]).split(main_layout[1]);
 
             let colors = app.get_colors();
-            //let colors_len = colors.len();
 
             let table = Table::new(colors, widths)
                 .widths(widths)
-                .highlight_style(Style::new().bold().fg(Color::Cyan));
+                .row_highlight_style(Style::new().bold().fg(Color::Cyan));
 
             let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(None)
