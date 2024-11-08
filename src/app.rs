@@ -35,7 +35,7 @@ pub struct App {
 impl App {
     pub fn new() -> Result<App> {
         let mut color_table_state = TableState::default();
-        color_table_state.select(Some(0)); 
+        color_table_state.select_cell(Some((0,1))); 
         let constraints = Constraints::new();
         let colors = Vec::from([Color::random_new(constraints.clone())]);
         let app_directories = ProjectDirs::from("dev", "Corax", "Saswatch").expect("Failed to get program directories");
@@ -182,10 +182,10 @@ impl App {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
         if selected < entries-1 {
-            self.color_table_state.select(Some(selected+1));
+            self.color_table_state.select_cell(Some((selected+1,1)));
             self.scrollbar_state.next();
         }else{
-            self.color_table_state.select(Some(0));
+            self.color_table_state.select_cell(Some((0,1)));
             self.scrollbar_state.first();
         }
     }
@@ -194,10 +194,10 @@ impl App {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
         if selected > 0 {
-            self.color_table_state.select(Some(selected-1));
+            self.color_table_state.select_cell(Some((selected-1,1)));
             self.scrollbar_state.prev();
         }else {
-            self.color_table_state.select(Some(entries-1));
+            self.color_table_state.select_cell(Some((entries-1,1)));
             self.scrollbar_state.last();
         }
     }
