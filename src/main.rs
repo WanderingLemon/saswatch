@@ -2,6 +2,7 @@ mod ui;
 mod app;
 mod color;
 mod files;
+mod helptext;
 
 use std::{
     io, 

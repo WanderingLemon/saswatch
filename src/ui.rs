@@ -1,16 +1,16 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Margin, Rect}, 
-    style::{Color, Modifier, Style, Stylize}, 
+    style::{Color, Style, Stylize}, 
     symbols::block, 
     text::{Line, Span}, 
-    widgets::{Block, Clear, Paragraph, Row, Scrollbar, ScrollbarOrientation, Table},
+    widgets::{Block, Clear, Paragraph, Scrollbar, ScrollbarOrientation, Table},
     Frame
 };
 
-use crate::app::{App, Mode};
-
-const KEY_STYLE:Style = Style::new().fg(Color::LightBlue).add_modifier(Modifier::BOLD);
-const DESC_STYLE:Style = Style::new().fg(Color::White);
+use crate::{
+    app::{App, Mode},
+    helptext::{to_paragraph, EXPORTING_HELP_LINE, GENERATING_HELP_LINE_1, GENERATING_HELP_LINE_2, HELPSCREEN_ENTRIES, HELP_HELP_LINE_1}
+};
 
 pub fn ui(f: &mut Frame, app: &mut App) {
 
@@ -33,50 +33,12 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             render_main_section(f, app, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
             f.render_widget(Clear, main_layout[3]);
-            f.render_widget(Paragraph::new(Line::from(vec![
-                        Span::styled("k/\u{2191}", KEY_STYLE),
-                        Span::styled(": Up  ", DESC_STYLE),
-                        Span::styled("j/\u{2193}", KEY_STYLE),
-                        Span::styled(": Down  ", DESC_STYLE),
-                        Span::styled("s", KEY_STYLE),
-                        Span::styled(": Toggle color lock  ", DESC_STYLE),
-                        Span::styled("a", KEY_STYLE),
-                        Span::styled(": Append new  ", DESC_STYLE),
-                        Span::styled("c", KEY_STYLE),
-                        Span::styled(": Copy hex  ", DESC_STYLE),
-                        Span::styled("e", KEY_STYLE),
-                        Span::styled(": Export  ", DESC_STYLE),
-                        Span::styled("Space", KEY_STYLE),
-                        Span::styled(": Reroll  ", DESC_STYLE),
-
-            ])).on_black(), main_layout[2]);
-            f.render_widget(Paragraph::new(Line::from(vec![
-                        Span::styled("K/<S-\u{2191}>", KEY_STYLE),
-                        Span::styled(": Move selected up  ", DESC_STYLE),
-                        Span::styled("J/<S-\u{2193}>", KEY_STYLE),
-                        Span::styled(": Move selected down  ", DESC_STYLE),
-                        Span::styled("q", KEY_STYLE),
-                        Span::styled(": Quit  ", DESC_STYLE),
-                        Span::styled("?", KEY_STYLE),
-                        Span::styled(": Help  ", DESC_STYLE),
-            ])).on_black(), main_layout[3]);
-
+            f.render_widget(to_paragraph(GENERATING_HELP_LINE_1.to_vec()).on_black(), main_layout[2]);
+            f.render_widget(to_paragraph(GENERATING_HELP_LINE_2.to_vec()).on_black(), main_layout[3]);
         }
 
         Mode::Help => {
-            let help_table = Table::new([
-                Row::new(["?","Toggle this help screen"]),
-                Row::new(["q","Leaves sub-menu or quits the program when on main screen"]),
-                Row::new(["k/Up","Move up by one color, looping at top"]),
-                Row::new(["j/Down","Move down by one color, looping at bottom"]),
-                Row::new(["K/Shift+Up","Move selected color up by one, looping at top"]),
-                Row::new(["J/Shift+Down","Move selected color down by one, looping at bottom"]),
-                Row::new(["a","Append a new, random color at the bottom of the list"]),
-                Row::new(["s","Toggle the lock state of selected color"]),
-                Row::new(["c","Copy the selected color's hex code to the system clipboard"]),
-                Row::new(["e","Enter export mode for the current color palette, exports to .sh"]),
-                Row::new(["Space","Reroll all unlocked colors"]),
-            ], [
+            let help_table = Table::new(HELPSCREEN_ENTRIES.clone(), [
             Constraint::Length(16),
             Constraint::Fill(1)
             ])
@@ -90,24 +52,14 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
             f.render_widget(Clear, main_layout[2]);
             f.render_widget(Block::new().on_black(), main_layout[3]);
-            f.render_widget(Paragraph::new(Line::from(vec![
-                        Span::styled("q", KEY_STYLE),
-                        Span::styled(": Back  ", DESC_STYLE),
-                        Span::styled("?", KEY_STYLE),
-                        Span::styled(": Toggle help", DESC_STYLE)
-            ])).on_black(), main_layout[2]);
+            f.render_widget(to_paragraph(HELP_HELP_LINE_1.to_vec()).on_black(), main_layout[2]);
 
         }
         Mode::Exporting => {
             render_main_section(f, app, main_layout[1]);
             f.render_widget(Clear, main_layout[2]);
             f.render_widget(Clear, main_layout[3]);
-            f.render_widget(Paragraph::new(Line::from(vec![
-                        Span::styled("ESC", KEY_STYLE),
-                        Span::styled(": Back  ", DESC_STYLE),
-                        Span::styled("Enter", KEY_STYLE),
-                        Span::styled(": Export", DESC_STYLE)
-            ])).on_black(), main_layout[2]);
+            f.render_widget(to_paragraph(EXPORTING_HELP_LINE.to_vec()).on_black(), main_layout[2]);
 
             f.render_widget(Paragraph::new(Line::from(vec![
                         Span::styled("Exporting to: ", Style::new().light_yellow()),
