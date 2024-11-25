@@ -84,7 +84,7 @@ impl App {
                 match self.mode {
                     Mode::Generating => {
                         match key {
-                        KeyEvent{code: KeyCode::Char('q'), ..} => { return Some(Ok(()))}
+                        KeyEvent{code: KeyCode::Esc, ..} => { return Some(Ok(()))}
 
                         KeyEvent{code: KeyCode::Down,modifiers: KeyModifiers::SHIFT,..} | KeyEvent{code: KeyCode::Char('J'),..}=> {
                             self.shift_down()
@@ -135,7 +135,7 @@ impl App {
 
                     Mode::Help => {
                         match key.code {
-                            KeyCode::Char('q') | KeyCode::Char('?') => {
+                            KeyCode::Esc | KeyCode::Char('?') => {
                                 self.mode = Mode::Generating
                             }
 
