@@ -285,10 +285,8 @@ impl App {
         let file = File::create(pallets.join(format!("{}.sh", self.input_buffer)))?;
         let mut writer = BufWriter::new(file);
 
-        let mut counter = 0;
-        for color in self.colors.to_owned() {
+        for (counter, color) in self.colors.iter().enumerate() {
             writer.write_fmt(format_args!("color{}=\"{}\"\n", counter, color.hex_string()))?;
-            counter += 1;
         }
         
         self.input_buffer = String::new();
