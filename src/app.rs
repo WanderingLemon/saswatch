@@ -166,7 +166,7 @@ impl App {
                         }
                     }
                 }
-        return None
+        None
     }
 
     pub fn get_mode(&self) -> &Mode {
@@ -261,11 +261,7 @@ impl App {
     pub fn toggle_lock(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let color = self.colors.get_mut(selected).unwrap();
-        if !color.locked {
-            color.locked = true;
-        } else {
-            color.locked = false; 
-        }
+        color.locked = !color.locked;
     }
 
     pub fn regen_unlocked(&mut self) {

@@ -11,6 +11,12 @@ pub struct Constraints {
     lightness: Range<f32>
 }
 
+impl Default for Constraints {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Constraints {
     pub fn new() -> Self {
         Self {
@@ -52,11 +58,11 @@ impl Color {
     }
 }
 
-impl <'a> Into<Row<'a>> for Color {
-    fn into(self) -> Row<'a> {
-        let rgb: Srgb<u8> = Srgb::from_color_unclamped(self.okhsl).into();
-        let hsl = self.okhsl;
-        let lock_icon = if self.locked {"\u{1f512}"} else {"\u{1f513}"};
+impl <'a> From<Color> for Row<'a> {
+    fn from(val: Color) -> Self {
+        let rgb: Srgb<u8> = Srgb::from_color_unclamped(val.okhsl).into();
+        let hsl = val.okhsl;
+        let lock_icon = if val.locked {"\u{1f512}"} else {"\u{1f513}"};
         let cell1 = Cell::from(lock_icon.yellow());
         let cell2 = Cell::from(format!("hsl({:.0},{:.2},{:.2})\n#{:x}", hsl.hue.into_inner(), hsl.saturation, hsl.lightness, rgb)).white();
         let cell3 = Cell::from("").style(Style::default().bg(rgb.into()));
