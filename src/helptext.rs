@@ -13,6 +13,7 @@ lazy_static!{
         Row::new(["K/Shift+Up","Move selected color up by one, looping at top"]),
         Row::new(["J/Shift+Down","Move selected color down by one, looping at bottom"]),
         Row::new(["a","Append a new, random color at the bottom of the list"]),
+        Row::new(["d","Remove the selected color"]),
         Row::new(["s","Toggle the lock state of selected color"]),
         Row::new(["c","Copy the selected color's hex code to the system clipboard"]),
         Row::new(["e","Enter export mode for the current color palette, exports to .sh"]),
