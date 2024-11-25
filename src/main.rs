@@ -1,7 +1,6 @@
 mod ui;
 mod app;
 mod color;
-mod files;
 mod helptext;
 
 use std::panic::{set_hook, take_hook};
