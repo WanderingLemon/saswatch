@@ -12,7 +12,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Constraint::Fill(1),
         Constraint::Length(1),
         Constraint::Length(1)
-    ]).split(f.size());
+    ]).split(f.area());
     
     f.render_widget(Paragraph::new("Saswatch")
         .bold()
