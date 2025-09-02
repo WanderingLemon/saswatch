@@ -17,8 +17,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     f.render_widget(Paragraph::new("Saswatch")
         .bold()
         .centered()
-        , 
-        main_layout[0]);    
+        , main_layout[0]);    
 
     let mode = app.get_mode();
 
@@ -39,7 +38,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
         let table = Table::new(colors, widths)
             .widths(widths)
-            .highlight_style(Style::new().bold().fg(Color::Cyan));
+            .row_highlight_style(Style::new().bold().fg(Color::Cyan));
         
         let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
             .begin_symbol(None)
@@ -108,7 +107,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
             Constraint::Fill(1)
             ])
                 .block(Block::bordered()
-                    .title(Title::from("Help").alignment(Alignment::Center))
+                    .title(Title::from("Help")).title_alignment(Alignment::Center)
                 );
 
             f.render_widget(help_table, 
@@ -128,7 +127,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
         Mode::Exporting => {
             let widths = [
                 Constraint::Length(2),
-                Constraint::Length(17),
+                Constraint::Length(20),
                 Constraint::Fill(1)
             ];
 
@@ -142,7 +141,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
             let table = Table::new(colors, widths)
                 .widths(widths)
-                .highlight_style(Style::new().bold().fg(Color::Cyan));
+                .row_highlight_style(Style::new().bold().fg(Color::Cyan));
 
             let scrollbar = Scrollbar::new(ScrollbarOrientation::VerticalRight)
                 .begin_symbol(None)

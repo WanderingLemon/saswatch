@@ -29,8 +29,8 @@ pub struct Color {
 
 impl Color {
     pub fn random_new(constraints: Constraints) -> Self {
-        let mut rng = rand::thread_rng();
-        let okhsl = Okhsl::new(OklabHue::new(rng.gen_range(constraints.hue)), rng.gen_range(constraints.saturation), rng.gen_range(constraints.lightness));
+        let mut rng = rand::rng();
+        let okhsl = Okhsl::new(OklabHue::new(rng.random_range(constraints.hue)), rng.random_range(constraints.saturation), rng.random_range(constraints.lightness));
         Self {
             okhsl,
             locked: false,
@@ -38,11 +38,11 @@ impl Color {
     }
 
     pub fn regen(&mut self, constraints: Constraints){
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         self.okhsl = Okhsl::new(
-            OklabHue::new(rng.gen_range(constraints.hue)),
-            rng.gen_range(constraints.saturation),
-            rng.gen_range(constraints.lightness)
+            OklabHue::new(rng.random_range(constraints.hue)),
+            rng.random_range(constraints.saturation),
+            rng.random_range(constraints.lightness)
         );
     }
 

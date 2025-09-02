@@ -1,6 +1,5 @@
 use ratatui::{buffer::Buffer, layout::Rect, style::{Style, Styled}, text::Line, widgets::{StatefulWidget, StatefulWidgetRef, Widget, WidgetRef}};
 
-
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct SliderState {
     position: u16,
@@ -162,4 +161,11 @@ impl StatefulWidgetRef for Slider{
         row += 1;
         buf.set_line(0, row, &Line::from(format!("{}", state.position).set_style(self.value_style)), 10);
     }
+}
+
+pub struct SliderList {
+    // List of tuples containing a slider and its state
+    sliders: Vec<(Slider, SliderState)>,
+    // index of the active slider
+    active: u32
 }
