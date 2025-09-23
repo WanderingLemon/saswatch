@@ -155,7 +155,7 @@ impl App {
                             }
 
                             KeyCode::Enter => {
-                                return Some(self.export_to_sh())
+                                return Some(self.export())
                             }
 
                             KeyCode::Char(ch) => {
@@ -280,9 +280,9 @@ impl App {
         let _ = self.clipboard_ctx.set_contents(hex);
     }
 
-    pub fn export_to_sh(&mut self) -> Result<()>{
+    pub fn export(&mut self) -> Result<()>{
         let pallets = self.app_directories.data_dir().join("palettes");
-        let file = File::create(pallets.join(format!("{}.sh", self.input_buffer)))?;
+        let file = File::create(pallets.join(format!("{}", self.input_buffer)))?;
         let mut writer = BufWriter::new(file);
 
         for (counter, color) in self.colors.iter().enumerate() {

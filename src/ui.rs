@@ -57,7 +57,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
 
             f.render_widget(Paragraph::new(Line::from(vec![
                         Span::styled("Exporting to: ", Style::new().light_yellow()),
-                        Span::raw(format!("{}.sh",app.input_buffer.clone()))
+                        Span::raw(format!("{}",app.input_buffer.clone()))
             ]))
                 .on_black().white(),
                 main_layout[2])
