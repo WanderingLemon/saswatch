@@ -21,7 +21,9 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     ]).split(f.area());
 
     let mode = app.get_mode();
-
+    
+    // Render the UI differently based on what mode we are in.
+    // TODO Make this more elegant and less repetative.
     match mode{
         Mode::Generating => {
             render_main_section(f, app, main_layout[0]);
@@ -65,6 +67,7 @@ pub fn ui(f: &mut Frame, app: &mut App) {
     }
 }
 
+/// Renders the main section of the UI which doesn't change with mode.
 fn render_main_section(f: &mut Frame, app: &mut App, area: Rect) {
     let blk = Block::default().title_top(Line::from("Saswatch").centered());
     let widths = [

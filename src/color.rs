@@ -17,6 +17,7 @@ impl Default for Constraints {
     }
 }
 
+/// Defines the HSL bounds that a color can be within.
 impl Constraints {
     pub fn new() -> Self {
         Self {
@@ -34,6 +35,7 @@ pub struct Color {
 }
 
 impl Color {
+    /// Generates a random color within the bounds of the constraints passed in.
     pub fn random_new(constraints: Constraints) -> Self {
         let mut rng = rand::thread_rng();
         let okhsl = Okhsl::new(OklabHue::new(rng.gen_range(constraints.hue)), rng.gen_range(constraints.saturation), rng.gen_range(constraints.lightness));
@@ -42,7 +44,8 @@ impl Color {
             locked: false,
         }
     }
-
+    
+    /// Randomize the color within the bounds of the passed constraints.
     pub fn regen(&mut self, constraints: Constraints){
         let mut rng = rand::thread_rng();
         self.okhsl = Okhsl::new(
@@ -52,6 +55,7 @@ impl Color {
         );
     }
 
+    /// Get the color as a hexadecimal string
     pub fn hex_string(&self) -> String {
         let rgb: Srgb<u8> = Srgb::from_color_unclamped(self.okhsl).into();
         format!("#{:x}",rgb)
@@ -59,6 +63,7 @@ impl Color {
 }
 
 impl <'a> From<Color> for Row<'a> {
+    /// Convert from a color to a Ratatui Table row
     fn from(val: Color) -> Self {
         let rgb: Srgb<u8> = Srgb::from_color_unclamped(val.okhsl).into();
         let hsl = val.okhsl;

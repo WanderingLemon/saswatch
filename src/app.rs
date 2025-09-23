@@ -33,6 +33,7 @@ pub struct App {
 }
 
 impl App {
+
     pub fn new() -> Result<App> {
         let mut color_table_state = TableState::default();
         color_table_state.select_cell(Some((0,1))); 
@@ -172,7 +173,8 @@ impl App {
     pub fn get_mode(&self) -> &Mode {
         &self.mode
     }
-    
+
+    /// Select the next entry in the list (wrapping at end).
     pub fn inc_select(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
@@ -185,6 +187,7 @@ impl App {
         }
     }
     
+    /// Select the previous entry in the list (wrapping at start).
     pub fn dec_select(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
@@ -197,12 +200,14 @@ impl App {
         }
     }
     
+    /// Adds a new random color to the list.
     pub fn insert_color(&mut self) {
         let constraints = Constraints::new();
         self.colors.push(Color::random_new(constraints));
         self.scrollbar_state = self.scrollbar_state.content_length(self.colors.len());
     }
-
+    
+    /// Removes the selected color from the list.
     pub fn remove_color(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
@@ -220,6 +225,7 @@ impl App {
         self.colors.to_owned()
     }
 
+    /// Move the currently selected color up in the list by one.
     pub fn shift_up(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
@@ -239,6 +245,7 @@ impl App {
         }
     }
 
+    /// Move the currently selected color down in the list by one.
     pub fn shift_down(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let entries = self.colors.len();
@@ -257,13 +264,15 @@ impl App {
             self.scrollbar_state.first();
         }
     }
-
+    
+    /// Toggles the lock state of the currently selected color.
     pub fn toggle_lock(&mut self) {
         let selected = self.color_table_state.selected().unwrap();
         let color = self.colors.get_mut(selected).unwrap();
         color.locked = !color.locked;
     }
-
+    
+    /// Randomize all colors that aren't locked.
     pub fn regen_unlocked(&mut self) {
         let colors = self.colors.iter_mut();
         for color in colors {
