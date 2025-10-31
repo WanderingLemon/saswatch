@@ -4,6 +4,7 @@ version = "0.2.3"
 edition = "2021"
 
 [dependencies]
+sliders = {path = "./sliders/"}
 better-panic = "0.3.0"
 clipboard = "0.5.0"
 color-eyre = "0.6.3"
