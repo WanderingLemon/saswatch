@@ -2,7 +2,7 @@ use std::ops::Range;
 
 use palette::{
     convert::{FromColorUnclamped, TryIntoColor},
-    DarkenAssign, DesaturateAssign, Hsl, IntoColor, IsWithinBounds, LightenAssign, Okhsl, OklabHue,
+    DarkenAssign, DesaturateAssign, IntoColor, LightenAssign, Okhsl, OklabHue,
     SaturateAssign, ShiftHueAssign, Srgb,
 };
 use rand::Rng;
